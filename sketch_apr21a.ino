@@ -1,11 +1,12 @@
 #include <ESP8266WiFi.h>
-#include <PubSubClient.h>
 #include <SoftwareSerial.h>
+#include <PubSubClient.h>
+
 
 EspSoftwareSerial::UART nucleoSerial;
 
-const char* ssid = "1_Hotspot"; // change to your wifi name
-const char* password = "love2020"; // change to your password
+const char* ssid = "Al1"; // change to your wifi name
+const char* password = "just317balk"; // change to your password
 
 const char* mqtt_server = "broker.netpie.io";
 const int mqtt_port = 1883;
@@ -51,19 +52,20 @@ void setup() {
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-  //client.setServer(mqtt_server, mqtt_port);
+  client.setServer(mqtt_server, mqtt_port);
 
-  nucleoSerial.begin(115200, EspSoftwareSerial::SWSERIAL_8N1, D6, D5, false, 95, 11);
+  nucleoSerial.begin(115200, EspSoftwareSerial::SWSERIAL_8N1, D6, D5);
 }
 
 void receiveData(){
+  Serial.println("get data...");
   nucleoSerial.listen();
   nucleoSerial.write('a');
-  while(nucleoSerial.available()<8){
-    delay(1);
-  }
-  for(int i =0;i<8;i++){
-    necleo_data[i] = nucleoSerial.read();
+  int x = 0;
+  delay(50);
+  while (nucleoSerial.available() > 0) {
+    necleo_data[x] = nucleoSerial.read();
+    x = (++x)%8;
   }
 }
 
@@ -74,32 +76,31 @@ float recieveTemp() {
 
 float recieveHumd() {
   // humid in % .2f
-  return ((int)necleo_data[4]) + ((((int)necleo_data[5])*1.0)/10);
+  return ((int)necleo_data[4]) + ((((int)necleo_data[5])*1.0)/100);
 }
 
 float recieveHeight() {
   //height in cm .1f
-  return ((int)necleo_data[0]) + ((((int)necleo_data[1])*1.0)/10);
+  return ((int)necleo_data[0]) + ((((int)necleo_data[1])*1.0)/100);
 }
 
 float recieveLight() {
   // light in % 
-  return ((int)necleo_data[6]) + ((((int)necleo_data[7])*1.0)/10);
+  return ((int)necleo_data[6]) + ((((int)necleo_data[7])*1.0)/100);
 }
 
 void loop() {
     // recieve some value here
-    // right now it's fake value, You have to edit it
     receiveData();
     float temperature = recieveTemp();
     float humidity = recieveHumd();
     float height = recieveHeight();
     float light = recieveLight();
 
-    // if (!client.connected()) {
-    //   reconnect();
-    // }
-    // client.loop();
+    if (!client.connected()) {
+      reconnect();
+    }
+    client.loop();
 
     // format to JSON
     String data = 
@@ -112,6 +113,6 @@ void loop() {
     data.toCharArray(msg, (data.length() + 1));
 
     // send to Gavin's Netpie
-    //client.publish("@shadow/data/update", msg);
+    client.publish("@shadow/data/update", msg);
     delay(2000);
 }

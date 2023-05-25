@@ -82,6 +82,8 @@ uint8_t light_intensity_percent_fp = 0;
 uint16_t min_light = 100;
 uint16_t max_light = 2500;
 
+uint8_t max_depth = 10;
+
 char x[100];
 char y = '0';
 char comm;
@@ -149,9 +151,13 @@ void read_distance(){
 	__HAL_TIM_SET_COUNTER(&htim1,0);
 	while((HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)));
 	uint16_t echo_time = __HAL_TIM_GET_COUNTER(&htim1);
-	float temp = echo_time/58;
+	float temp = 1.0*echo_time/58;
+	if(temp > max_depth){
+		temp = max_depth - 0.01;
+	}
+	temp = max_depth - temp;
 	distance_cm = temp;
-	distance_cm_fp = ((int)(temp*10))%10;
+	distance_cm_fp = ((int)(temp*100))%100;
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
