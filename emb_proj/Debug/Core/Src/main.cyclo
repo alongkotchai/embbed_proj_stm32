@@ -1,0 +1,17 @@
+main.c:90:6:delay_us	2
+main.c:97:6:read_ldr	4
+main.c:112:6:read_dht11	9
+main.c:143:6:read_distance	3
+main.c:157:6:HAL_TIM_PeriodElapsedCallback	3
+main.c:170:6:HAL_UART_RxCpltCallback	1
+main.c:191:5:main	1
+main.c:252:6:SystemClock_Config	3
+main.c:298:13:MX_ADC1_Init	3
+main.c:350:13:MX_TIM1_Init	4
+main.c:396:13:MX_TIM2_Init	4
+main.c:441:13:MX_TIM3_Init	4
+main.c:486:13:MX_TIM4_Init	4
+main.c:531:13:MX_USART1_UART_Init	2
+main.c:564:13:MX_USART2_UART_Init	2
+main.c:597:13:MX_GPIO_Init	1
+main.c:669:6:Error_Handler	1
